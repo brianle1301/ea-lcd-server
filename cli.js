@@ -95,4 +95,5 @@ yargs(hideBin(process.argv))
       });
     },
   })
-  .help().argv;
+  .help()
+  .parserConfiguration({ "boolean-negation": false }).argv;
