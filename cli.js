@@ -66,15 +66,15 @@ yargs(hideBin(process.argv))
         describe: "The port the events server will be listening on",
       });
 
-      yargs.option("no-install", {
+      yargs.option("no-clone", {
         type: "boolean",
         default: false,
-        describe: "Whether to build and install dependencies",
+        describe: "Whether to clone the repo",
       });
     },
 
-    handler: ({ port, noInstall }) => {
-      if (!noInstall) {
+    handler: ({ port, noClone }) => {
+      if (!noClone) {
         spawnSync("rm -rf ea-lcd", {
           cwd: process.cwd(),
           stdio: "inherit",
@@ -83,24 +83,6 @@ yargs(hideBin(process.argv))
 
         spawnSync("git clone https://github.com/brianle1301/ea-lcd", {
           cwd: process.cwd(),
-          stdio: "inherit",
-          shell: true,
-        });
-
-        spawnSync("cd ea-lcd", {
-          cwd: process.cwd(),
-          stdio: "inherit",
-          shell: true,
-        });
-
-        spawnSync("npm install", {
-          cwd: process.cwd() + "/ea-lcd",
-          stdio: "inherit",
-          shell: true,
-        });
-
-        spawnSync("npm run build", {
-          cwd: process.cwd() + "/ea-lcd",
           stdio: "inherit",
           shell: true,
         });
