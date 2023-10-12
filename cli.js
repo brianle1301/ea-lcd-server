@@ -65,38 +65,46 @@ yargs(hideBin(process.argv))
         default: 3000,
         describe: "The port the events server will be listening on",
       });
+
+      yargs.option("no-install", {
+        type: "boolean",
+        default: false,
+        describe: "Whether to build and install dependencies",
+      });
     },
 
-    handler: ({ port }) => {
-      spawnSync("rm -rf ea-lcd", {
-        cwd: process.cwd(),
-        stdio: "inherit",
-        shell: true,
-      });
+    handler: ({ port, noInstall }) => {
+      if (!noInstall) {
+        spawnSync("rm -rf ea-lcd", {
+          cwd: process.cwd(),
+          stdio: "inherit",
+          shell: true,
+        });
 
-      spawnSync("git clone https://github.com/brianle1301/ea-lcd", {
-        cwd: process.cwd(),
-        stdio: "inherit",
-        shell: true,
-      });
+        spawnSync("git clone https://github.com/brianle1301/ea-lcd", {
+          cwd: process.cwd(),
+          stdio: "inherit",
+          shell: true,
+        });
 
-      spawnSync("cd ea-lcd", {
-        cwd: process.cwd(),
-        stdio: "inherit",
-        shell: true,
-      });
+        spawnSync("cd ea-lcd", {
+          cwd: process.cwd(),
+          stdio: "inherit",
+          shell: true,
+        });
 
-      spawnSync("npm install", {
-        cwd: process.cwd() + "/ea-lcd",
-        stdio: "inherit",
-        shell: true,
-      });
+        spawnSync("npm install", {
+          cwd: process.cwd() + "/ea-lcd",
+          stdio: "inherit",
+          shell: true,
+        });
 
-      spawnSync("npm run build", {
-        cwd: process.cwd() + "/ea-lcd",
-        stdio: "inherit",
-        shell: true,
-      });
+        spawnSync("npm run build", {
+          cwd: process.cwd() + "/ea-lcd",
+          stdio: "inherit",
+          shell: true,
+        });
+      }
 
       spawn(`npx serve -s build -p ${port}`, {
         cwd: process.cwd() + "/ea-lcd",
