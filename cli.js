@@ -11,7 +11,7 @@ import { hideBin } from "yargs/helpers";
 const readEventFile = async function (eventfile) {
   const content = await readFile(eventfile);
   const lines = content.toString().trim().split("\n");
-  const events = lines.map((line) => line.split("]")[1]);
+  const events = lines.map((line) => line.trim().split("]")[1]);
   return events;
 };
 
