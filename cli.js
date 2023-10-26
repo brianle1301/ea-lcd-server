@@ -51,9 +51,7 @@ yargs(hideBin(process.argv))
                 console.log("Initial State: ", event);
                 socket.send(
                   JSON.stringify({
-                    initialState: event.startsWith("Stand Up")
-                      ? "Stand Up"
-                      : "Sitted",
+                    initialState: event,
                   })
                 );
                 break;
