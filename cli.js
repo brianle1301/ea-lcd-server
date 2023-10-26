@@ -8,13 +8,11 @@ import { WebSocketServer, WebSocket } from "ws";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
-const lastEvent = async function (eventfile) {
+const readEventFile = async function (eventfile) {
   const content = await readFile(eventfile);
   const lines = content.toString().trim().split("\n");
-  const lastLine = lines[lines.length - 1];
-  const [, event] = lastLine.split("]");
-
-  return event;
+  const events = lines.map((line) => line.split("]")[1]);
+  return events;
 };
 
 yargs(hideBin(process.argv))
@@ -40,16 +38,34 @@ yargs(hideBin(process.argv))
 
       wss.on("connection", async (socket) => {
         console.log("Connected to UI");
+
+        socket.on("message", async (data) => {
+          if (data.toString() === "INITIAL_STATE") {
+            const events = await readEventFile(eventfile);
+
+            // Find the initial state
+
+            for (let i = events.length - 1; i >= 0; i--) {
+              const event = events[i];
+              if (event === "Sitted" || event === "Stand Up") {
+                console.log("Initial State: ", event);
+                socket.send(JSON.stringify({ initialState: event }));
+                break;
+              }
+            }
+          }
+        });
       });
 
       const watcher = chokidar.watch(eventfile);
       watcher.on("change", async () => {
-        const event = await lastEvent(eventfile);
-        console.log("Event file changed, latest event detected:", event);
+        const events = await readEventFile(eventfile);
+        const type = events[events.length - 1];
+        console.log("Event file changed, latest event detected:", type);
 
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ event }));
+            client.send(JSON.stringify({ type }));
           }
         });
       });
