@@ -47,9 +47,15 @@ yargs(hideBin(process.argv))
 
             for (let i = events.length - 1; i >= 0; i--) {
               const event = events[i];
-              if (event === "Sitted" || event === "Stand Up") {
+              if (event === "Sitted" || event.startsWith("Stand Up")) {
                 console.log("Initial State: ", event);
-                socket.send(JSON.stringify({ initialState: event }));
+                socket.send(
+                  JSON.stringify({
+                    initialState: event.startsWith("Stand Up")
+                      ? "Stand Up"
+                      : "Sitted",
+                  })
+                );
                 break;
               }
             }
