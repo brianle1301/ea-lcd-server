@@ -11,9 +11,14 @@ import { hideBin } from "yargs/helpers";
 const readEventFile = async function (eventfile) {
   const content = await readFile(eventfile);
   const lines = content.toString().trim().split("\n");
-  const events = lines.map((line) => line.trim().split("]")[1]);
+  const events = lines
+    .slice(lastIndex)
+    .map((line) => line.trim().split("]")[1]);
+  lastIndex = lines.length;
   return events;
 };
+
+let lastIndex = 0;
 
 yargs(hideBin(process.argv))
   .command({
@@ -64,12 +69,14 @@ yargs(hideBin(process.argv))
       const watcher = chokidar.watch(eventfile);
       watcher.on("change", async () => {
         const events = await readEventFile(eventfile);
-        const type = events[events.length - 1];
-        console.log("Event file changed, latest event detected:", type);
+
+        console.log("Event file changed, latest event detected:", events);
 
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ type }));
+            for (const event of events) {
+              client.send(JSON.stringify({ type: event }));
+            }
           }
         });
       });
